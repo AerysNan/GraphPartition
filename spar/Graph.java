@@ -25,24 +25,12 @@ class Graph {
     return users.containsKey(id);
   }
 
-  public void addEdge(User user1, User user2) {
-    map.computeIfAbsent(user1.id, x -> new HashSet<>()).add(user2.id);
-    map.computeIfAbsent(user2.id, x -> new HashSet<>()).add(user1.id);
+  public void addEdge(int user1Id, int user2Id) {
+    map.computeIfAbsent(user1Id, x -> new HashSet<>()).add(user2Id);
+    map.computeIfAbsent(user2Id, x -> new HashSet<>()).add(user1Id);
   }
 
   public double averageReplicaNumber() {
     return (double) users.values().stream().mapToInt(x -> x.slaves.size()).sum() / users.size();
-  }
-
-  public boolean checkValidity() {
-    for (User user : users.values()) {
-      for (int id : map.get(user.id)) {
-        User neighbour = users.get(id);
-        if (user.master != neighbour.master && !user.slaves.contains(neighbour.master)
-            && !neighbour.slaves.contains(user.master))
-          return false;
-      }
-    }
-    return true;
   }
 }

@@ -43,13 +43,44 @@ abstract class PartitionerBasic {
   }
 
   public double partition(int n, int k) {
+    int count = 0;
     initialize(n, k);
     for (Point point : data) {
       placeNode(point.x);
       placeNode(point.y);
       adjustEdge(point.x, point.y);
+      if (++count % 1000 == 0)
+        System.out.println("Finished " + count + " transactions");
     }
     return graph.averageReplicaNumber();
+  }
+
+  public double imBalanceRatio() {
+    int max = Integer.MIN_VALUE, min = Integer.MAX_VALUE;
+    for (Set<Integer> server : servers) {
+      max = Math.max(max, server.size());
+      min = Math.min(min, server.size());
+    }
+    return max - min;
+  }
+
+  public boolean checkValidity() {
+    for (User user : graph.users.values()) {
+      for (int id : graph.map.get(user.id)) {
+        User neighbour = graph.users.get(id);
+        if (user.master != neighbour.master
+            && (!user.slaves.contains(neighbour.master) || !neighbour.slaves.contains(user.master)))
+          return false;
+      }
+    }
+    return true;
+  }
+
+  public boolean checkRedundancy() {
+    for (User user : graph.users.values())
+      if (user.slaves.size() < k)
+        return false;
+    return true;
   }
 
   abstract void placeNode(int userId);

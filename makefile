@@ -1,6 +1,6 @@
-all: bin run
+all: build run
 
-bin:
+build:
 	javac spar/Main.java
 
 run:
